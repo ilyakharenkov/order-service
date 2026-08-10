@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: order_postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: order-db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+    volumes:
+      - order_postgres_data:/var/lib/postgresql/data
+      - ./order-backups:/backups
+      - ./order-init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - order_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d order-db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  order_postgres_data:
+    name: order_postgres_data_volume
+
+networks:
+  order_network:
+    name: order_network
+    driver: bridge

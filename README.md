@@ -13,7 +13,7 @@ order-service/
 │   │   └── order_service.go
 │   ├── handlers/
 │   │   └── order_handler.go
-│   └── client/              # ← НОВОЕ! HTTP-клиент для inventory-service
+│   └── client/
 │       └── inventory_client.go
 └── migrations/
 └── 001_init.up.sql
