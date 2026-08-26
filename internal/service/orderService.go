@@ -29,9 +29,22 @@ func (service *orderService) FindAll() ([]dto.Order, error) {
 		return nil, err
 	}
 
-	fmt.Println(orders)
+	var sliceOrder = make([]dto.Order, 0, len(orders))
+	for _, it := range orders {
+		o1 := dto.Order{
+			ID:          it.ID,
+			OrderNumber: it.OrderNumber,
+			SKU:         it.SKU,
+			Quantity:    it.Quantity,
+			Status:      dto.OrderStatus(it.Status),
+			CreatedAt:   it.CreatedAt,
+			UpdatedAt:   it.UpdatedAt,
+		}
 
-	return nil, err
+		sliceOrder = append(sliceOrder, o1)
+	}
+
+	return sliceOrder, err
 }
 
 func (service *orderService) CreateOrder(order dto.Order) (dto.Order, error) {
