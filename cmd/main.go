@@ -1,16 +1,35 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
+	"order-service/configs"
 	"order-service/internal/handlers"
 	"order-service/internal/repository"
 	"order-service/internal/repository/model"
 	"order-service/internal/service"
 	"time"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
+	postgresConfig := configs.PostgresConfig()
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		postgresConfig.DBHost, postgresConfig.DBPort, postgresConfig.DBUser, postgresConfig.DBPassword, postgresConfig.DBName)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+
+		}
+	}(db)
+
 	orders := make([]model.Order, 0, 10)
 	now := time.Now()
 
@@ -41,7 +60,7 @@ func main() {
 		orders = append(orders, order)
 	}
 
-	orderRepository := repository.NewOrderRepository(orders)
+	orderRepository := repository.NewOrderRepository(db, orders)
 	orderService := service.NewOrderService(orderRepository)
 	orderHandler := handlers.NewOrderHttpHandler(orderService)
 

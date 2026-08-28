@@ -3,7 +3,6 @@ package dto
 import "time"
 
 type Order struct {
-	ID          int         `json:"id"`
 	OrderNumber string      `json:"order_number"`
 	SKU         string      `json:"sku"`
 	Quantity    int         `json:"quantity"`
