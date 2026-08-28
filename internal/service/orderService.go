@@ -5,6 +5,7 @@ import (
 	"order-service/internal/repository"
 	"order-service/internal/repository/model"
 	"order-service/internal/service/dto"
+	"time"
 )
 
 type OrderService interface {
@@ -52,8 +53,8 @@ func (service *orderService) CreateOrder(order *dto.Order) (*dto.Order, error) {
 		SKU:         order.SKU,
 		Quantity:    order.Quantity,
 		Status:      model.OrderStatus(order.Status),
-		CreatedAt:   order.CreatedAt,
-		UpdatedAt:   order.UpdatedAt,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Time{},
 	})
 
 	if err != nil {
