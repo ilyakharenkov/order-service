@@ -11,6 +11,8 @@ import (
 type OrderHandler interface {
 	FindAll(w http.ResponseWriter, r *http.Request)
 	CreateOrder(w http.ResponseWriter, r *http.Request)
+	CancelOrder(w http.ResponseWriter, r *http.Request)
+	FindOrder(w http.ResponseWriter, r *http.Request)
 }
 
 type orderHttpHandler struct {
@@ -60,4 +62,12 @@ func (handler *orderHttpHandler) CreateOrder(w http.ResponseWriter, r *http.Requ
 		log.Printf("Error %v", err2)
 		return
 	}
+}
+
+func (handler *orderHttpHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (handler *orderHttpHandler) FindOrder(w http.ResponseWriter, r *http.Request) {
+
 }

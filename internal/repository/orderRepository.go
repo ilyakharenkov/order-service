@@ -57,7 +57,3 @@ func (repository *orderRepositoryPostgres) FindOrder(id int) (model.Order, error
 	}
 	return model.Order{}, errors.New("order not found")
 }
-
-func CancelOrder() {
-
-}
