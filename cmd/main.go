@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"order-service/configs"
 	"order-service/internal/handlers"
+	"order-service/internal/httpClient"
 	"order-service/internal/repository"
 	"order-service/internal/repository/model"
 	"order-service/internal/service"
@@ -60,6 +61,8 @@ func main() {
 		orders = append(orders, order)
 	}
 
+	httpClient.NewInventoryClient("", &http.Client{})
+
 	orderRepository := repository.NewOrderRepository(db, orders)
 	orderService := service.NewOrderService(orderRepository)
 	orderHandler := handlers.NewOrderHttpHandler(orderService)
@@ -67,7 +70,7 @@ func main() {
 	http.HandleFunc("GET /orders", orderHandler.FindAll)
 	http.HandleFunc("POST /orders", orderHandler.CreateOrder)
 	http.HandleFunc("DELETE /orders", orderHandler.CancelOrder)
-	http.HandleFunc("GET /orders/{id}", orderHandler.FindOrder)
+	http.HandleFunc("GET /orders/{orderNumber}", orderHandler.FindOrder)
 
 	if err := http.ListenAndServe("localhost:8081", nil); err != nil {
 		fmt.Println(err)

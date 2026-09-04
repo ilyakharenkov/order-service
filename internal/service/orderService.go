@@ -11,7 +11,7 @@ import (
 type OrderService interface {
 	FindAll() ([]dto.Order, error)
 	CreateOrder(order *dto.Order) (*dto.Order, error)
-	FindOrder(id int) (dto.Order, error)
+	FindOrder(id string) (*dto.Order, error)
 }
 
 type orderService struct {
@@ -72,13 +72,18 @@ func (service *orderService) CreateOrder(order *dto.Order) (*dto.Order, error) {
 	}, err
 }
 
-func (service *orderService) FindOrder(id int) (dto.Order, error) {
+func (service *orderService) FindOrder(id string) (*dto.Order, error) {
 	order, err := service.repository.FindOrder(id)
 	if err != nil {
-		return dto.Order{}, err
+		return &dto.Order{}, err
 	}
 
-	fmt.Println(order)
-
-	return dto.Order{}, err
+	return &dto.Order{
+		OrderNumber: order.OrderNumber,
+		SKU:         order.SKU,
+		Quantity:    order.Quantity,
+		Status:      dto.OrderStatus(order.Status),
+		CreatedAt:   order.CreatedAt,
+		UpdatedAt:   order.UpdatedAt,
+	}, err
 }

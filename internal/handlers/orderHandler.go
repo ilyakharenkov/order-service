@@ -69,5 +69,19 @@ func (handler *orderHttpHandler) CancelOrder(w http.ResponseWriter, r *http.Requ
 }
 
 func (handler *orderHttpHandler) FindOrder(w http.ResponseWriter, r *http.Request) {
+	response, err := handler.service.FindOrder(r.PathValue("orderNumber"))
+	if err != nil {
+		log.Printf("Error %v", err.Error())
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err2 := json.NewEncoder(w).Encode(response)
+	if err2 != nil {
+		log.Printf("Error %v", err2)
+		return
+	}
 }
