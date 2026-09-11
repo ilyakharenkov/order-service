@@ -2,14 +2,17 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"order-service/internal/repository/model"
+	"time"
 )
 
 type OrderRepository interface {
 	FindAll() ([]model.Order, error)
 	CreateOrder(order *model.Order) (*model.Order, error)
 	FindOrder(orderNumber string) (model.Order, error)
+	CancelOrder(orderNumber string) (model.Order, error)
 }
 
 type orderRepositoryPostgres struct {
@@ -88,4 +91,21 @@ func (repository *orderRepositoryPostgres) FindOrder(orderNumber string) (model.
 	}
 
 	return order, nil
+}
+
+func (repository *orderRepositoryPostgres) CancelOrder(orderNumber string) (model.Order, error) {
+	query := "UPDATE order_t SET status = 'CANCELLED' WHERE order_t.id IN (SELECT order_t.id FROM order_t WHERE order_t.id = $1) RETURNING order_t.id"
+
+	row := repository.db.QueryRow(query, orderNumber)
+
+	fmt.Println(row)
+
+	return model.Order{
+		OrderNumber: orderNumber,
+		Status:      "CANCELLED",
+		SKU:         "",
+		Quantity:    0,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}, nil
 }
