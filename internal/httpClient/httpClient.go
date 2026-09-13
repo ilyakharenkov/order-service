@@ -23,7 +23,7 @@ func NewInventoryClient(url string, httpClient *http.Client) InventoryClient {
 }
 
 func (c *InventoryClientImpl) CheckAvailability(sku string, quantity int) (bool, error) {
-	response, err := c.httpClient.Get(fmt.Sprintf(""))
+	response, err := c.httpClient.Get(fmt.Sprintf("%s/products/%s", c.url, sku))
 	if err != nil {
 		return false, err
 	}
