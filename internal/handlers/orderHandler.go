@@ -11,8 +11,8 @@ import (
 type OrderHandler interface {
 	FindAll(w http.ResponseWriter, r *http.Request)
 	CreateOrder(w http.ResponseWriter, r *http.Request)
-	CancelOrder(w http.ResponseWriter, r *http.Request)
 	FindOrder(w http.ResponseWriter, r *http.Request)
+	CancelOrder(w http.ResponseWriter, r *http.Request)
 }
 
 type orderHttpHandler struct {
@@ -64,15 +64,30 @@ func (handler *orderHttpHandler) CreateOrder(w http.ResponseWriter, r *http.Requ
 	}
 }
 
-func (handler *orderHttpHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
-
-}
-
 func (handler *orderHttpHandler) FindOrder(w http.ResponseWriter, r *http.Request) {
 	response, err := handler.service.FindOrder(r.PathValue("orderNumber"))
 	if err != nil {
 		log.Printf("Error %v", err.Error())
 		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err2 := json.NewEncoder(w).Encode(response)
+	if err2 != nil {
+		log.Printf("Error %v", err2)
+		return
+	}
+}
+
+func (handler *orderHttpHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
+	orderNumber := r.URL.Query().Get(`orderNumber`)
+	response, err := handler.service.CancelOrder(orderNumber)
+	if err != nil {
+		log.Printf("Error %v", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 

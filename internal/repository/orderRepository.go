@@ -2,10 +2,8 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"order-service/internal/repository/model"
-	"time"
 )
 
 type OrderRepository interface {
@@ -94,18 +92,22 @@ func (repository *orderRepositoryPostgres) FindOrder(orderNumber string) (model.
 }
 
 func (repository *orderRepositoryPostgres) CancelOrder(orderNumber string) (model.Order, error) {
-	query := "UPDATE order_t SET status = 'CANCELLED' WHERE order_t.id IN (SELECT order_t.id FROM order_t WHERE order_t.id = $1) RETURNING order_t.id"
+	query := "UPDATE order_t SET status = 'CANCELLED' WHERE order_t.order_number IN (SELECT order_t.order_number FROM order_t WHERE order_t.order_number = $1) RETURNING order_t.id, order_t.order_number, order_t.sku, order_t.quantity, order_t.status, order_t.created_at, order_t.updated_at"
 
-	row := repository.db.QueryRow(query, orderNumber)
+	var order model.Order
+	err := repository.db.QueryRow(query, orderNumber).
+		Scan(
+			&order.ID,
+			&order.OrderNumber,
+			&order.SKU,
+			&order.Quantity,
+			&order.Status,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+		)
+	if err != nil {
+		return model.Order{}, err
+	}
 
-	fmt.Println(row)
-
-	return model.Order{
-		OrderNumber: orderNumber,
-		Status:      "CANCELLED",
-		SKU:         "",
-		Quantity:    0,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}, nil
+	return order, nil
 }

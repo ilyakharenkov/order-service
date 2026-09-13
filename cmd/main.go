@@ -69,8 +69,8 @@ func main() {
 
 	http.HandleFunc("GET /orders", orderHandler.FindAll)
 	http.HandleFunc("POST /orders", orderHandler.CreateOrder)
-	http.HandleFunc("PATCH /orders/cancel?orderNumber={number}", orderHandler.CancelOrder)
 	http.HandleFunc("GET /orders/{orderNumber}", orderHandler.FindOrder)
+	http.HandleFunc("PATCH /orders/cancel", orderHandler.CancelOrder)
 
 	if err := http.ListenAndServe("localhost:8081", nil); err != nil {
 		fmt.Println(err)

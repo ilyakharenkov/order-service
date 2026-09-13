@@ -12,6 +12,7 @@ type OrderService interface {
 	FindAll() ([]dto.Order, error)
 	CreateOrder(order *dto.Order) (*dto.Order, error)
 	FindOrder(id string) (*dto.Order, error)
+	CancelOrder(id string) (*dto.Order, error)
 }
 
 type orderService struct {
@@ -86,4 +87,20 @@ func (service *orderService) FindOrder(id string) (*dto.Order, error) {
 		CreatedAt:   order.CreatedAt,
 		UpdatedAt:   order.UpdatedAt,
 	}, err
+}
+
+func (service *orderService) CancelOrder(id string) (*dto.Order, error) {
+	order, err := service.repository.CancelOrder(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.Order{
+		OrderNumber: order.OrderNumber,
+		SKU:         order.SKU,
+		Quantity:    order.Quantity,
+		Status:      dto.OrderStatus(order.Status),
+		CreatedAt:   order.CreatedAt,
+		UpdatedAt:   order.UpdatedAt,
+	}, nil
 }
