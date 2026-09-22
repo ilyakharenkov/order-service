@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"order-service/internal/httpClient"
 	"order-service/internal/repository"
 	"order-service/internal/repository/model"
 	"order-service/internal/service/dto"
@@ -16,12 +17,14 @@ type OrderService interface {
 }
 
 type orderService struct {
-	repository repository.OrderRepository
+	repository      repository.OrderRepository
+	inventoryClient httpClient.InventoryClient
 }
 
-func NewOrderService(repository repository.OrderRepository) OrderService {
+func NewOrderService(repository repository.OrderRepository, inventoryClient httpClient.InventoryClient) OrderService {
 	return &orderService{
-		repository: repository,
+		repository:      repository,
+		inventoryClient: inventoryClient,
 	}
 }
 
@@ -33,7 +36,7 @@ func (service *orderService) FindAll() ([]dto.Order, error) {
 
 	var sliceOrder = make([]dto.Order, 0, len(orders))
 	for _, it := range orders {
-		o1 := dto.Order{
+		order := dto.Order{
 			OrderNumber: it.OrderNumber,
 			SKU:         it.SKU,
 			Quantity:    it.Quantity,
@@ -42,8 +45,14 @@ func (service *orderService) FindAll() ([]dto.Order, error) {
 			UpdatedAt:   it.UpdatedAt,
 		}
 
-		sliceOrder = append(sliceOrder, o1)
+		sliceOrder = append(sliceOrder, order)
 	}
+
+	product, err := service.inventoryClient.CheckAvailability("IPHONE_16", 1)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("Product: %v\n", product)
 
 	return sliceOrder, err
 }

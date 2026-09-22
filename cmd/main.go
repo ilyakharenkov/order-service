@@ -61,10 +61,9 @@ func main() {
 		orders = append(orders, order)
 	}
 
-	httpClient.NewInventoryClient("", &http.Client{})
-
+	inventoryClient := httpClient.NewInventoryClient("http://localhost:8080", &http.Client{})
 	orderRepository := repository.NewOrderRepository(db, orders)
-	orderService := service.NewOrderService(orderRepository)
+	orderService := service.NewOrderService(orderRepository, inventoryClient)
 	orderHandler := handlers.NewOrderHttpHandler(orderService)
 
 	http.HandleFunc("GET /orders", orderHandler.FindAll)

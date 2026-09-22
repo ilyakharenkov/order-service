@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"order-service/internal/service/dto"
 )
 
 type InventoryClient interface {
@@ -33,9 +34,13 @@ func (c *InventoryClientImpl) CheckAvailability(sku string, quantity int) (bool,
 		return false, fmt.Errorf("server returned %s", response.Status)
 	}
 
-	if err := json.NewDecoder(response.Body).Decode(&sku); err != nil {
+	var product dto.Product
+
+	if err := json.NewDecoder(response.Body).Decode(&product); err != nil {
 		return false, err
 	}
+
+	fmt.Printf("Product: %+v\n", product)
 
 	return true, nil
 }
