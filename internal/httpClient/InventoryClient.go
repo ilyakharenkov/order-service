@@ -1,6 +1,7 @@
 package httpClient
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -46,6 +47,24 @@ func (client *InventoryClientImpl) CheckAvailability(sku string, quantity int) (
 }
 
 func (client *InventoryClientImpl) ReserveProduct(sku string, quantity int) error {
+	var request dto.Stock
+	request = dto.Stock{
+		Action:   "subtract",
+		Quantity: int64(quantity),
+	}
+
+	jsonRequest, _ := json.Marshal(request)
+
+	response, err := client.httpClient.Post(fmt.Sprintf("%s/aaa/stock?sku=%s", client.url, sku), "application/json", bytes.NewReader(jsonRequest))
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("inventory-service returned http code: %s", response.Status)
+	}
+
 	return nil
 }
 
