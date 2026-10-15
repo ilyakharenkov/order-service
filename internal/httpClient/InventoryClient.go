@@ -69,5 +69,22 @@ func (client *InventoryClientImpl) ReserveProduct(sku string, quantity int) erro
 }
 
 func (client *InventoryClientImpl) CancelOrder(sku string, quantity int) error {
+	request := dto.Stock{
+		Action:   "add",
+		Quantity: int64(quantity),
+	}
+
+	jsonRequest, _ := json.Marshal(request)
+
+	response, err := client.httpClient.Post(fmt.Sprintf("%s/aaa/stock?sku=%s", client.url, sku), "application/json", bytes.NewReader(jsonRequest))
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("inventory-service returned http code: %s", response.Status)
+	}
+
 	return nil
 }
